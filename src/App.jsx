@@ -65,7 +65,24 @@ function App() {
     columnId: "",
   });
 
+  const [editTask, setEditTask] = useState({
+    id: "",
+    title: "",
+    columnId: "",
+  });
+
+  const [showEdit, setShowEdit] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
+
+  const toggleEdit = (item, index) => {
+    setShowEdit(index);
+    setEditTask(item);
+  };
+
+  const handleEdit = (e) => {
+    const { name, value } = e.target;
+    setEditTask({ ...editTask, [name]: value });
+  };
 
   const handleNewTask = (e) => {
     const { name, value } = e.target;
@@ -77,37 +94,49 @@ function App() {
     setTasks([...tasks, newTask]);
   };
 
+  const saveEditTask = (task, newTask) => {
+    const findTask = tasks.some((tas) => tas?.id == task?.id);
+
+    if (findTask) {
+      const updateTask = tasks.map((tas) => {
+        return task.id == tas.id
+          ? {
+              ...tas,
+              ...newTask,
+            }
+          : tas;
+      });
+      setTasks(updateTask);
+      setShowEdit(null);
+    }
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor)
   );
 
-  const handleDragStart = (event) => {
-    const { active } = event;
+  const handleDragStart = ({ active }) => {
     const draggedTask = tasks.find((t) => t.id === active.id);
     setActiveTask(draggedTask);
   };
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-
+  const handleDragEnd = ({ active, over }) => {
     if (!over) return;
 
     const draggedTaskId = active.id;
     const droppedOverId = over.id;
 
-    // Cek apakah drop di atas kolom (bukan task lain)
     const targetColumn = columns.find((col) => col.id === droppedOverId);
     const targetColumnId = targetColumn
       ? targetColumn.id
       : tasks.find((t) => t.id === droppedOverId)?.columnId;
 
-    if (
-      targetColumnId &&
-      targetColumnId !== active.data.current?.sortable?.containerId
-    ) {
+    if (targetColumnId) {
       setTasks((prev) =>
         prev.map((task) =>
           task.id === draggedTaskId
@@ -143,13 +172,15 @@ function App() {
             ) : null}
           </DragOverlay>
 
-          <form onSubmit={submitNewTask}>
+          {/* Form tambah task */}
+          <form onSubmit={submitNewTask} className="mb-6">
             <input
               type="text"
               name="id"
               value={newTask.id}
               placeholder="input new id"
               onChange={handleNewTask}
+              className="border p-2 mr-2"
             />
             <input
               type="text"
@@ -157,6 +188,7 @@ function App() {
               value={newTask.title}
               placeholder="input title"
               onChange={handleNewTask}
+              className="border p-2 mr-2"
             />
             <input
               type="text"
@@ -164,36 +196,87 @@ function App() {
               value={newTask.columnId}
               placeholder="input column id"
               onChange={handleNewTask}
+              className="border p-2 mr-2"
             />
-            <button type="submit">submit</button>
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2">
+              submit
+            </button>
           </form>
 
           <div className="flex gap-6 overflow-x-auto pb-4">
             {columns.map((col) => {
-              const columnTasks = tasks
-                .filter((task) => task.columnId === col.id)
-                .map((task) => task.id);
+              const columnTasks = tasks.filter(
+                (task) => task?.columnId === col.id
+              );
+              const columnTaskIds = columnTasks.map((t) => t.id);
 
               return (
                 <div
                   key={col.id}
                   className="bg-gray-100 rounded-xl p-4 min-w-80 shadow-sm"
-                  id={col.id}
                 >
                   <h2 className="font-bold text-lg text-gray-700 mb-4 px-2">
                     {col.title} ({columnTasks.length})
                   </h2>
 
                   <SortableContext
-                    items={columnTasks}
+                    items={columnTaskIds}
                     strategy={verticalListSortingStrategy}
                   >
                     <div className="space-y-3 min-h-96">
-                      {tasks
-                        .filter((task) => task.columnId === col.id)
-                        .map((task) => (
-                          <TaskItem key={task.id} task={task} />
-                        ))}
+                      {columnTasks.map((task, index) => (
+                        <div key={task.id} className="relative">
+                          <TaskItem task={task} />
+
+                          {/* Tombol delete */}
+                          <button
+                            onClick={() => deleteTask(task.id)}
+                            className="absolute top-2 right-2 text-red-500"
+                          >
+                            ✕
+                          </button>
+                          <button
+                            onClick={() => toggleEdit(task, index)}
+                            className="absolute top-2 right-2 text-red-500"
+                          >
+                            Edit
+                          </button>
+                          {showEdit == index ? (
+                            <div>
+                              <input
+                                type="text"
+                                name="id"
+                                value={editTask.id}
+                                placeholder="input new id"
+                                onChange={handleEdit}
+                                className="border p-2 mr-2"
+                              />
+                              <input
+                                type="text"
+                                name="title"
+                                value={editTask.title}
+                                placeholder="input title"
+                                onChange={handleEdit}
+                                className="border p-2 mr-2"
+                              />
+                              <input
+                                type="text"
+                                name="columnId"
+                                value={editTask.columnId}
+                                placeholder="input column id"
+                                onChange={handleEdit}
+                                className="border p-2 mr-2"
+                              />
+                              <button
+                                className="bg-blue-500 text-white px-4 py-2"
+                                onClick={() => saveEditTask(task, editTask)}
+                              >
+                                Save Edit
+                              </button>
+                            </div>
+                          ) : null}
+                        </div>
+                      ))}
                     </div>
                   </SortableContext>
                 </div>
