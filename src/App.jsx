@@ -60,15 +60,13 @@ function App() {
   ]);
 
   const [newTask, setNewTask] = useState({
-    id: "",
     title: "",
-    columnId: "",
+    columnId: "col-1",
   });
 
   const [editTask, setEditTask] = useState({
     id: "",
     title: "",
-    columnId: "",
   });
 
   const [showEdit, setShowEdit] = useState(null);
@@ -91,7 +89,16 @@ function App() {
 
   const submitNewTask = (e) => {
     e.preventDefault();
-    setTasks([...tasks, newTask]);
+    setTasks([
+      ...tasks,
+      {
+        id: Date.now().toString(),
+        ...newTask,
+      },
+    ]);
+    setNewTask({
+      title: "",
+    });
   };
 
   const saveEditTask = (task, newTask) => {
@@ -176,25 +183,9 @@ function App() {
           <form onSubmit={submitNewTask} className="mb-6">
             <input
               type="text"
-              name="id"
-              value={newTask.id}
-              placeholder="input new id"
-              onChange={handleNewTask}
-              className="border p-2 mr-2"
-            />
-            <input
-              type="text"
               name="title"
               value={newTask.title}
               placeholder="input title"
-              onChange={handleNewTask}
-              className="border p-2 mr-2"
-            />
-            <input
-              type="text"
-              name="columnId"
-              value={newTask.columnId}
-              placeholder="input column id"
               onChange={handleNewTask}
               className="border p-2 mr-2"
             />
@@ -256,14 +247,6 @@ function App() {
                                 name="title"
                                 value={editTask.title}
                                 placeholder="input title"
-                                onChange={handleEdit}
-                                className="border p-2 mr-2"
-                              />
-                              <input
-                                type="text"
-                                name="columnId"
-                                value={editTask.columnId}
-                                placeholder="input column id"
                                 onChange={handleEdit}
                                 className="border p-2 mr-2"
                               />
