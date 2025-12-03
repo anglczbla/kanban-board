@@ -142,7 +142,7 @@ function TodoForm() {
 
   const logoutUser = useMutation({
     mutationFn: () => {
-      return axiosInstance.post("logout");
+      return axiosInstance.post("/users/logout");
     },
     onSuccess: () => {
       alert("logout success");

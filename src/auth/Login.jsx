@@ -21,7 +21,7 @@ const Login = () => {
 
   const loginUser = useMutation({
     mutationFn: (formLogin) => {
-      return axiosInstance.post("login", formLogin);
+      return axiosInstance.post("/users/login", formLogin);
     },
     onSuccess: () => {
       alert("login success");
