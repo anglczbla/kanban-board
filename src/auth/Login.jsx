@@ -6,12 +6,12 @@ import axiosInstance from "./api";
 const Login = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const backendUrl = import.meta.env.VITE_BE_URL;
+
   const [formLogin, setFormLogin] = useState({
     username: "",
     password: "",
   });
-  const [errors, SetErrors] = useState(null);
+  const [errors, setErrors] = useState({});
   console.log("isi errors", errors);
 
   const handleLogin = (e) => {
@@ -35,43 +35,71 @@ const Login = () => {
     },
     onError: (error) => {
       console.error(error);
-      const newError = error.response.data.message;
+      const newError = error.response.data.errors;
       console.log("isi new error", newError);
 
-      SetErrors(newError);
+      const errorObj = {};
+
+      newError.forEach((item) => {
+        const namaField = Object.keys(item)[0];
+        const pesan = item[namaField];
+
+        if (!errorObj[namaField]) {
+          errorObj[namaField] = [];
+        }
+        errorObj[namaField].push(pesan);
+      });
+
+      setErrors(errorObj);
       alert("failed login");
     },
   });
 
   const submitLogin = (e) => {
     e.preventDefault();
-    SetErrors(null);
+    setErrors({});
     loginUser.mutate(formLogin);
   };
 
   return (
     <div>
-      {errors !== null && errors.length > 0 ? (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <p className="font-semibold">Gagal login:</p>
-          {errors}
-        </div>
-      ) : null}
       <form onSubmit={submitLogin}>
-        <input
-          type="text"
-          name="username"
-          value={formLogin.username}
-          placeholder="Input username"
-          onChange={handleLogin}
-        />
-        <input
-          type="password"
-          name="password"
-          value={formLogin.password}
-          placeholder="Input Password"
-          onChange={handleLogin}
-        />
+        <div>
+          <input
+            type="text"
+            name="username"
+            value={formLogin.username}
+            placeholder="Input username"
+            onChange={handleLogin}
+            className={errors.username ? "border-red-500" : ""}
+          />
+          {errors.username && (
+            <div className="text-red-500 text-sm mt-1">
+              {errors.username.map((msg, index) => (
+                <p key={index}>{msg}</p>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <input
+            type="password"
+            name="password"
+            value={formLogin.password}
+            placeholder="Input Password"
+            onChange={handleLogin}
+            className={errors.password ? "border-red-500" : ""}
+          />
+          {errors.password && (
+            <div className="text-red-500 text-sm mt-1">
+              {errors.password.map((msg, index) => (
+                <p key={index}>{msg}</p>
+              ))}
+            </div>
+          )}
+        </div>
+
         <button type="submit">Login</button>
       </form>
     </div>

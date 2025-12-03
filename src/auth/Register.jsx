@@ -6,14 +6,12 @@ import axiosInstance from "./api";
 const Register = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const backendUrl = import.meta.env.VITE_BE_URL;
   const [formRegist, setFormRegist] = useState({
     email: "",
     password: "",
     username: "",
   });
   const [errors, setErrors] = useState(null);
-  console.log("isi errors", errors);
 
   const handleRegist = (e) => {
     const { name, value } = e.target;
@@ -37,21 +35,23 @@ const Register = () => {
     onError: (error) => {
       console.error(error);
       const newErrors = error.response.data.errors;
+      console.log("isi errors dari backend:", newErrors);
+
       const newError = {};
 
       newErrors.forEach((item) => {
         const namaField = Object.keys(item)[0];
-        console.log("isi nama field", namaField);
         const pesan = item[namaField];
-        console.log("isi pesan", pesan);
 
-        if (!errorBaru[namaField]) {
+        console.log("field:", namaField, "| pesan:", pesan);
+
+        if (!newError[namaField]) {
           newError[namaField] = [];
-        } else {
-          newError[namaField].push(pesan);
         }
+        newError[namaField].push(pesan);
       });
 
+      console.log("error setelah transform:", newError);
       setErrors(newError);
       alert("failed regist");
     },
@@ -62,41 +62,76 @@ const Register = () => {
     setErrors(null);
     registrasi.mutate(formRegist);
   };
+
   return (
-    <div>
-      {errors !== null && errors.length > 0 ? (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <p className="font-semibold">Gagal registrasi:</p>
-          <ul className="list-disc list-inside mt-2">
-            {errors.map((err, index) => (
-              <li key={index}>{Object.values(err).join(", ")}</li>
-            ))}
-          </ul>
+    <div className="max-w-md mx-auto p-6">
+      <form onSubmit={registUser} className="space-y-4">
+        <div>
+          <input
+            type="email"
+            name="email"
+            value={formRegist.email}
+            placeholder="Input Email"
+            onChange={handleRegist}
+            className={`border p-2 w-full rounded ${
+              errors?.email ? "border-red-500" : "border-gray-300"
+            }`}
+          />
+          {errors?.email && (
+            <div className="text-red-500 text-sm mt-1">
+              {errors.email.map((msg, idx) => (
+                <div key={idx}>• {msg}</div>
+              ))}
+            </div>
+          )}
         </div>
-      ) : null}
-      <form onSubmit={registUser}>
-        <input
-          type="email"
-          name="email"
-          value={formRegist.email}
-          placeholder="Input Email"
-          onChange={handleRegist}
-        />
-        <input
-          type="password"
-          name="password"
-          value={formRegist.password}
-          placeholder="Input Password"
-          onChange={handleRegist}
-        />
-        <input
-          type="text"
-          name="username"
-          value={formRegist.username}
-          placeholder="Input Username"
-          onChange={handleRegist}
-        />
-        <button type="submit">Register</button>
+
+        <div>
+          <input
+            type="password"
+            name="password"
+            value={formRegist.password}
+            placeholder="Input Password"
+            onChange={handleRegist}
+            className={`border p-2 w-full rounded ${
+              errors?.password ? "border-red-500" : "border-gray-300"
+            }`}
+          />
+          {errors?.password && (
+            <div className="text-red-500 text-sm mt-1">
+              {errors.password.map((msg, idx) => (
+                <div key={idx}>• {msg}</div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <input
+            type="text"
+            name="username"
+            value={formRegist.username}
+            placeholder="Input Username"
+            onChange={handleRegist}
+            className={`border p-2 w-full rounded ${
+              errors?.username ? "border-red-500" : "border-gray-300"
+            }`}
+          />
+          {errors?.username && (
+            <div className="text-red-500 text-sm mt-1">
+              {errors.username.map((msg, idx) => (
+                <div key={idx}>• {msg}</div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600"
+        >
+          Register
+        </button>
       </form>
     </div>
   );
