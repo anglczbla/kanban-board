@@ -10,10 +10,10 @@ const Register = () => {
   const [formRegist, setFormRegist] = useState({
     email: "",
     password: "",
-    role: "",
     username: "",
   });
   const [errors, setErrors] = useState(null);
+  console.log("isi errors", errors);
 
   const handleRegist = (e) => {
     const { name, value } = e.target;
@@ -31,13 +31,27 @@ const Register = () => {
       setFormRegist({
         email: "",
         password: "",
-        role: "",
         username: "",
       });
     },
     onError: (error) => {
       console.error(error);
-      const newError = error.response.data.errors;
+      const newErrors = error.response.data.errors;
+      const newError = {};
+
+      newErrors.forEach((item) => {
+        const namaField = Object.keys(item)[0];
+        console.log("isi nama field", namaField);
+        const pesan = item[namaField];
+        console.log("isi pesan", pesan);
+
+        if (!errorBaru[namaField]) {
+          newError[namaField] = [];
+        } else {
+          newError[namaField].push(pesan);
+        }
+      });
+
       setErrors(newError);
       alert("failed regist");
     },
@@ -73,13 +87,6 @@ const Register = () => {
           name="password"
           value={formRegist.password}
           placeholder="Input Password"
-          onChange={handleRegist}
-        />
-        <input
-          type="text"
-          name="role"
-          value={formRegist.role}
-          placeholder="Input Role"
           onChange={handleRegist}
         />
         <input

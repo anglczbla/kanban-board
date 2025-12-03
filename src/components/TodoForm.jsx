@@ -7,11 +7,17 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ListTodo from "./ListTodo";
 
 import { SortableContext } from "@dnd-kit/sortable";
-import { useState } from "react";
+import axiosInstance from "../auth/api";
 function TodoForm() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const backendUrl = import.meta.env.VITE_BE_URL;
   const [columns] = useState([
     { id: "col-1", title: "To Do" },
     { id: "col-2", title: "Doing" },
@@ -134,12 +140,33 @@ function TodoForm() {
     ...tasks.map((task) => task.id),
   ];
 
+  const logoutUser = useMutation({
+    mutationFn: () => {
+      return axiosInstance.post("logout");
+    },
+    onSuccess: () => {
+      alert("logout success");
+      navigate("/");
+      queryClient.invalidateQueries({ queryKey: ["logout"] });
+    },
+    onError: (error) => {
+      console.error(error);
+      alert("logout failed");
+    },
+  });
+
+  const logout = () => {
+    logoutUser.mutate();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-10">
           My Kanban Board
         </h1>
+
+        <button onClick={logout}>Logout</button>
 
         <DndContext
           sensors={sensors}

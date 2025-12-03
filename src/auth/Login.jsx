@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "./api";
 
 const Login = () => {
   const queryClient = useQueryClient();
@@ -21,7 +21,7 @@ const Login = () => {
 
   const loginUser = useMutation({
     mutationFn: (formLogin) => {
-      return axios.post(backendUrl + "login", formLogin);
+      return axiosInstance.post("login", formLogin);
     },
     onSuccess: () => {
       alert("login success");
