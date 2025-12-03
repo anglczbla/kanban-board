@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "./api";
 
 const Register = () => {
   const queryClient = useQueryClient();
@@ -22,7 +22,7 @@ const Register = () => {
 
   const registrasi = useMutation({
     mutationFn: (regist) => {
-      return axios.post(backendUrl + "register", regist);
+      return axiosInstance.post("/users/register", regist);
     },
     onSuccess: () => {
       alert("registration success");
