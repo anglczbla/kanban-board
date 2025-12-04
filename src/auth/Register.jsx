@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "./api";
 
@@ -12,10 +12,21 @@ const Register = () => {
     username: "",
   });
   const [errors, setErrors] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    if (showLogin == true) {
+      navigate("/");
+    }
+  });
 
   const handleRegist = (e) => {
     const { name, value } = e.target;
     setFormRegist({ ...formRegist, [name]: value });
+  };
+
+  const toggleLogin = () => {
+    setShowLogin(!showLogin);
   };
 
   const registrasi = useMutation({
@@ -133,6 +144,7 @@ const Register = () => {
           Register
         </button>
       </form>
+      <button onClick={toggleLogin}>Already Regist?</button>
     </div>
   );
 };

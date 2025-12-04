@@ -1,18 +1,24 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "./api";
 
 const Login = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
   const [formLogin, setFormLogin] = useState({
     username: "",
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [showRegist, setShowRegist] = useState(false);
   console.log("isi errors", errors);
+
+  useEffect(() => {
+    if (showRegist == true) {
+      navigate("/register");
+    }
+  }, [showRegist]);
 
   const handleLogin = (e) => {
     const { name, value } = e.target;
@@ -61,6 +67,10 @@ const Login = () => {
     loginUser.mutate(formLogin);
   };
 
+  const toggleRegist = () => {
+    setShowRegist(!showRegist);
+  };
+
   return (
     <div>
       <form onSubmit={submitLogin}>
@@ -102,6 +112,7 @@ const Login = () => {
 
         <button type="submit">Login</button>
       </form>
+      <button onClick={toggleRegist}>Register</button>
     </div>
   );
 };
