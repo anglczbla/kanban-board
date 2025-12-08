@@ -7,17 +7,15 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { SortableContext } from "@dnd-kit/sortable";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ListTodo from "./ListTodo";
 
-import { SortableContext } from "@dnd-kit/sortable";
-import axiosInstance from "../auth/api";
 function TodoForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const backendUrl = import.meta.env.VITE_BE_URL;
   const [columns] = useState([
     { id: "col-1", title: "To Do" },
     { id: "col-2", title: "Doing" },
@@ -115,7 +113,7 @@ function TodoForm() {
     const draggedTaskId = active.id;
     const droppedOverId = over.id;
 
-    // Cek apakah drop ke column langsung
+    // cek apakah drop ke column langsung
     const targetColumn = columns.find((col) => col.id === droppedOverId);
     const targetColumnId = targetColumn
       ? targetColumn.id
@@ -134,39 +132,32 @@ function TodoForm() {
     setActiveTask(null);
   };
 
-  // Gabungkan column IDs dengan task IDs untuk droppable areas
+  // gabungkan column IDs dengan task IDs untuk droppable areas
   const allDroppableIds = [
     ...columns.map((col) => col.id),
     ...tasks.map((task) => task.id),
   ];
 
-  const logoutUser = useMutation({
-    mutationFn: () => {
-      return axiosInstance.post("/users/logout");
-    },
-    onSuccess: () => {
-      alert("logout success");
-      navigate("/");
-      queryClient.invalidateQueries({ queryKey: ["logout"] });
-    },
-    onError: (error) => {
-      console.error(error);
-      alert("logout failed");
-    },
-  });
-
   const logout = () => {
-    logoutUser.mutate();
+    localStorage.clear();
+    sessionStorage.clear();
+    alert("logout success");
+    navigate("/");
+    queryClient.clear();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-10">
-          My Kanban Board
-        </h1>
-
-        <button onClick={logout}>Logout</button>
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-3xl font-bold text-gray-800">My Kanban Board</h1>
+          <button
+            onClick={logout}
+            className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors text-sm font-medium"
+          >
+            Logout
+          </button>
+        </div>
 
         <DndContext
           sensors={sensors}
@@ -176,31 +167,32 @@ function TodoForm() {
         >
           <DragOverlay>
             {activeTask ? (
-              <div className="bg-white p-4 rounded-lg shadow-2xl border border-gray-300 rotate-3 opacity-95">
-                <p className="font-semibold text-gray-800">
-                  {activeTask.title}
-                </p>
+              <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 rotate-2 cursor-grabbing">
+                <p className="font-medium text-gray-800">{activeTask.title}</p>
               </div>
             ) : null}
           </DragOverlay>
 
           {/* Form tambah task */}
-          <div className="mb-6 bg-white p-4 rounded-lg shadow">
-            <div className="flex gap-2">
+          <div className="mb-8 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 className="text-lg font-medium text-gray-700 mb-4">
+              Add New Task
+            </h3>
+            <div className="flex gap-4">
               <input
                 type="text"
                 name="title"
                 value={newTask.title}
-                placeholder="Add new task..."
+                placeholder="What needs to be done?"
                 onChange={handleNewTask}
                 onKeyDown={(e) => e.key === "Enter" && submitNewTask()}
-                className="border p-2 flex-1 rounded"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               />
               <select
                 name="columnId"
                 value={newTask.columnId}
                 onChange={handleNewTask}
-                className="border p-2 rounded"
+                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
                 {columns.map((col) => (
                   <option key={col.id} value={col.id}>
@@ -210,7 +202,7 @@ function TodoForm() {
               </select>
               <button
                 onClick={submitNewTask}
-                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium transition-colors"
               >
                 Add Task
               </button>

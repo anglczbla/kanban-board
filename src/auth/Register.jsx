@@ -11,6 +11,7 @@ const Register = () => {
     password: "",
     username: "",
   });
+
   const [errors, setErrors] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
 
@@ -45,22 +46,24 @@ const Register = () => {
     },
     onError: (error) => {
       console.error(error);
-      const newErrors = error.response.data.errors;
+      const newErrors = error.response?.data?.errors;
       console.log("isi errors dari backend:", newErrors);
 
       const newError = {};
 
-      newErrors.forEach((item) => {
-        const namaField = Object.keys(item)[0];
-        const pesan = item[namaField];
+      if (newErrors) {
+        newErrors.forEach((item) => {
+          const namaField = Object.keys(item)[0];
+          const pesan = item[namaField];
 
-        console.log("field:", namaField, "| pesan:", pesan);
+          console.log("field:", namaField, "| pesan:", pesan);
 
-        if (!newError[namaField]) {
-          newError[namaField] = [];
-        }
-        newError[namaField].push(pesan);
-      });
+          if (!newError[namaField]) {
+            newError[namaField] = [];
+          }
+          newError[namaField].push(pesan);
+        });
+      }
 
       console.log("error setelah transform:", newError);
       setErrors(newError);
@@ -75,76 +78,101 @@ const Register = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <form onSubmit={registUser} className="space-y-4">
-        <div>
-          <input
-            type="email"
-            name="email"
-            value={formRegist.email}
-            placeholder="Input Email"
-            onChange={handleRegist}
-            className={`border p-2 w-full rounded ${
-              errors?.email ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {errors?.email && (
-            <div className="text-red-500 text-sm mt-1">
-              {errors.email.map((msg, idx) => (
-                <div key={idx}>• {msg}</div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <input
-            type="password"
-            name="password"
-            value={formRegist.password}
-            placeholder="Input Password"
-            onChange={handleRegist}
-            className={`border p-2 w-full rounded ${
-              errors?.password ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {errors?.password && (
-            <div className="text-red-500 text-sm mt-1">
-              {errors.password.map((msg, idx) => (
-                <div key={idx}>• {msg}</div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <input
-            type="text"
-            name="username"
-            value={formRegist.username}
-            placeholder="Input Username"
-            onChange={handleRegist}
-            className={`border p-2 w-full rounded ${
-              errors?.username ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {errors?.username && (
-            <div className="text-red-500 text-sm mt-1">
-              {errors.username.map((msg, idx) => (
-                <div key={idx}>• {msg}</div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600"
-        >
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-md w-full bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
           Register
-        </button>
-      </form>
-      <button onClick={toggleLogin}>Already Regist?</button>
+        </h2>
+        <form onSubmit={registUser} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formRegist.email}
+              placeholder="Enter your email"
+              onChange={handleRegist}
+              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                errors?.email ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors?.email && (
+              <div className="text-red-500 text-sm mt-1">
+                {errors.email.map((msg, idx) => (
+                  <div key={idx}>• {msg}</div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formRegist.password}
+              placeholder="Create a password"
+              onChange={handleRegist}
+              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                errors?.password ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors?.password && (
+              <div className="text-red-500 text-sm mt-1">
+                {errors.password.map((msg, idx) => (
+                  <div key={idx}>• {msg}</div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={formRegist.username}
+              placeholder="Choose a username"
+              onChange={handleRegist}
+              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                errors?.username ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors?.username && (
+              <div className="text-red-500 text-sm mt-1">
+                {errors.username.map((msg, idx) => (
+                  <div key={idx}>• {msg}</div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-md transition-colors"
+          >
+            Create Account
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Already have an account?{" "}
+            <button
+              onClick={toggleLogin}
+              className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
+            >
+              Sign In
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

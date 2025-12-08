@@ -15,7 +15,7 @@ function TaskItem({ task }) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.3 : 1,
   };
 
   return (
@@ -24,9 +24,13 @@ function TaskItem({ task }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+      className={`bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing ${
+        isDragging ? "ring-2 ring-blue-500 shadow-xl rotate-2" : ""
+      }`}
     >
-      <p className="text-gray-800 font-medium">{task.title}</p>
+      <p className="text-gray-800 text-sm font-medium leading-relaxed break-words">
+        {task.title}
+      </p>
     </div>
   );
 }
