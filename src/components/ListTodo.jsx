@@ -46,7 +46,7 @@ function ListTodo({
                       {/* Tombol delete & edit - only show on hover (group-hover) */}
                       <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => toggleEdit(task, index)}
+                          onClick={() => toggleEdit(task)}
                           className="text-gray-400 hover:text-blue-500 bg-white rounded-full p-1 shadow-sm border border-gray-200"
                           title="Edit"
                         >
@@ -88,7 +88,7 @@ function ListTodo({
                       </div>
 
                       {/* Form edit */}
-                      {showEdit === index && (
+                      {showEdit === task.id && (
                         <div className="absolute inset-0 z-10 bg-white p-3 rounded-lg border border-blue-200 shadow-md flex flex-col gap-2">
                           <input
                             type="text"
@@ -100,13 +100,13 @@ function ListTodo({
                             className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') saveEdit(task, editTask);
-                                if (e.key === 'Escape') toggleEdit(null, null);
+                                if (e.key === 'Escape') toggleEdit(null);
                             }}
                           />
                           <div className="flex gap-2 justify-end">
                              <button
                               className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-200"
-                              onClick={() => toggleEdit(null, null)}
+                              onClick={() => toggleEdit(null)}
                             >
                               Cancel
                             </button>

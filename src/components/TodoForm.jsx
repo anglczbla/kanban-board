@@ -43,10 +43,12 @@ function TodoForm() {
   const [showEdit, setShowEdit] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
 
-  const toggleEdit = (item, index) => {
-    setShowEdit(index);
+  const toggleEdit = (item) => {
     if (item) {
+      setShowEdit(item.id);
       setEditTask(item);
+    } else {
+      setShowEdit(null);
     }
   };
 
